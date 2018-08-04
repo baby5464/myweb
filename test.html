@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Test Nodejs</title>
+
+<style>
+
+	.contain{
+		margin:0 auto;
+		padding: 5px;
+		width: 90%;
+		text-align: center;
+		word-wrap: break-word;
+	}
+
+	.btn{
+		outline: none;
+		width: 120px;
+		height: 50px;
+		border:none;
+		background-color: #ccc;
+	}
+
+</style>
+</head>
+<body>
+
+	<button id="postBtn" class="btn">发送数据</button>
+	
+	<div id="main" class="contain"></div>
+
+<script src="assets/js/jquery-1.10.2.min.js"></script>
+<script>
+
+	$(document).ready(function(){
+
+		var domain = document.domain;
+		var url = document.location;
+		var urlPath = 'http://'+domain+':3000/postdata'
+
+	  $("#postBtn").click(function(){
+
+	  	var $btn = $(this)
+	  	$btn.text("正在发送...")
+
+	    var rnd = Math.random()
+	   	
+	   	var data = {
+	   		id:rnd,
+	   		type:"post",
+	   		imageUrl:"https://open-image.nosdn.127.net/252d0a7a4c2c4506aa9c7d6985bb0e00.jpg"
+	   	}
+
+
+	   	$.post(urlPath, data, function(returnData) {
+	   		var dat = returnData;
+	   		var obj = JSON.parse(dat)
+
+		  	console.log("返回数据对象")
+		  	console.log(obj)
+
+		  	$btn.text("发送数据")
+
+		  	$("#main").html(returnData)
+
+		});
+
+
+	  });
+
+	  
+
+	});
+	  
+</script>
+</body>
+</html>

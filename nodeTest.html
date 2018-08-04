@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1" />
+<title>postTest</title>
+</head>
+<body>
+
+	<button id="postBtn">发送数据</button>
+	
+	<div id="main"></div>
+
+	<div id="myupload">
+		
+		<form enctype="multipart/form-data" method="post">
+			<input type="file" id="uploadFile" runat="server" />
+			<input type="button" id="btnUpload" value="确定" />
+			<div id="imgDiv">
+			</div>
+		</form>
+	</div>
+<script src="assets/js/jquery-1.10.2.min.js"></script>
+<script>
+
+	$(document).ready(function(){
+
+		var domain = document.domain;
+		var url = document.location;
+		var urlPath = 'http://'+domain+':3000/postdata'
+
+	  $("#postBtn").click(function(){
+	    var rnd = Math.random()
+	   	
+	   	var data = {
+	   		id:rnd,
+	   		type:"post",
+	   		imageUrl:"https://open-image.nosdn.127.net/252d0a7a4c2c4506aa9c7d6985bb0e00.jpg"
+	   	}
+
+
+	   	$.post(urlPath, data, function(returnData) {
+	   		var dat = returnData;
+	   		var obj = JSON.parse(dat)
+		  	console.log("返回数据对象")
+		  	console.log(obj)
+
+		});
+
+
+	  });
+
+	  //--------------------------
+	  var upfileUrlPath = 'http://'+domain+':3000/upfile'
+		
+
+	  $("#btnUpload").click(function(){
+	  	uploadImage() 
+	  })
+
+		function uploadImage() {
+        	//判断是否有选择上传文件
+            var imgPath = $("#uploadFile").val();
+
+            if (imgPath == "") {
+                //alert("请选择上传图片！");
+                return;
+            }
+            //判断上传文件的后缀名
+            var strExtension = imgPath.substr(imgPath.lastIndexOf('.') + 1);
+            if (strExtension != 'jpg' && strExtension != 'gif'
+            && strExtension != 'png' && strExtension != 'bmp') {
+                //alert("请选择图片文件");
+                //return;
+            }
+
+            var csrf = $("input[name='filename']").val();
+            var formData=new FormData();
+    		formData.append("filename",csrf);
+    		formData.append('pic', $("#uploadFile")[0].files[0]); 
+            $.ajax({
+                type: "POST",
+                url: upfileUrlPath,
+                data: formData,
+                contentType: false,
+          		processData: false,
+                success: function(data) {
+                    //alert("上传成功");
+                    $("#imgDiv").empty();
+                    //$("#imgDiv").html(data);
+                    $("#imgDiv").show();
+
+                    console.log(data)
+
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    //alert("上传失败，请检查网络后重试");
+                }
+            });
+        }
+	  //--------------------------
+
+	});
+	  
+</script>
+</body>
+</html>
