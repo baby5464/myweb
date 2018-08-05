@@ -1,12 +1,21 @@
 //Qt 工具类
+
+var fs = require('fs')
 var Q = require('../utils/QtUtil.js')
 var http = require('http')
+var https = require('https')
 var url = require('url')
 
 var serverTimes = 0
 
 function serverStart(route, handler, requestHandlers){
-    var svrObj = http.createServer(function(req,res){
+
+	var privateKey  = fs.readFileSync('./nd/cert/1533531003345.key', 'utf8');
+	var certificate = fs.readFileSync('./nd/cert/1533531003345.pem', 'utf8');
+	var credentials = {key: privateKey, cert: certificate};
+
+
+    var svrObj = https.createServer(credentials,function(req,res){
 
     	if(url.parse(req.url).path=='/favicon.ico')return
 
