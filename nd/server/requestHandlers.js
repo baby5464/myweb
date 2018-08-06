@@ -4,15 +4,11 @@ var querystring = require('querystring')
 
 
 function start(){
-	
-  console.log("request handler 'start' was called");
-  
   function sleep(milliSeconds){
       var startTime = new Date().getTime();
       while(new Date().getTime() < startTime + milliSeconds)
         ;  
   }
-  
   sleep(1000);
   return "hello start!";
 }
@@ -121,8 +117,6 @@ function upload(res, req){
   
   return "hello upload!";
 }
-
-
 function upfile(res, req){
 
     //iconv-lite mp3-header fluent-ffmpeg formidable image-size music-metadata
@@ -306,8 +300,22 @@ function upfile(res, req){
 
     return "hello upfile!";
 }
+function getAccessToken(res, req){
+    var APPID = 'wxf37702f410a6762c'
+    var APPSECRET = 'ad904274f1ad6998df68f3299ea04af5'
+    var svrUrl = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + APPID + '&secret=' + APPSECRET
 
-exports.start = start;
-exports.upload = upload;
-exports.postdata = postdata;
-exports.upfile = upfile;
+    var headerInfo = {'content-type': 'text/plain; charset=utf-8',"Access-Control-Allow-Origin":"*"}
+    res.writeHead(200, headerInfo)
+    res.write("nihao")
+    //res.end(util.inspect({fields: fields, files: files}));
+    res.end()
+}
+
+
+
+exports.start = start
+exports.upload = upload
+exports.postdata = postdata
+exports.upfile = upfile
+exports.getAccessToken = getAccessToken

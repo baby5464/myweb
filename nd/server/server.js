@@ -58,19 +58,26 @@ function serverStart(route, handler, requestHandlers){
 
 	    }else if(pathname == "/upfile" && req.method.toLowerCase() == 'post'){
 
-
-
+	        route(handler, pathname, res, req);
+	        
+	    }else if(pathname == "/getAccessToken" && req.method.toLowerCase() == 'get'){
 
 	        route(handler, pathname, res, req);
 	        
-
+	    }else{
+	    	var headerObj = {
+        		"Content-Type":"text/plain; charset=utf-8"
+        	}
+	      	res.writeHead(200, headerObj);
+	      	res.write('welcome to qiter.com ！');  
+	      	res.end("");
 	    }
 	    //console.log('pathname:'+pathname);
 
 
     })
 
-    svrObj.listen(3000);
+    svrObj.listen(8000);
     
     console.log('http server start on port 3000');
 }
