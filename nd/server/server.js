@@ -64,6 +64,10 @@ function serverStart(route, handler, requestHandlers){
 
 	        route(handler, pathname, res, req);
 	        
+	    }else if(pathname == "/getSmallAppQr" && req.method.toLowerCase() == 'post'){
+
+	        route(handler, pathname, res, req);
+	        
 	    }else{
 	    	var headerObj = {
         		"Content-Type":"text/plain; charset=utf-8"

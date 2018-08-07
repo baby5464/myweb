@@ -14,6 +14,7 @@ handler['/postdata'] = requestHandlers.postdata
 handler['/upload'] = requestHandlers.upload
 handler['/upfile'] = requestHandlers.upfile
 handler['/getAccessToken'] = requestHandlers.getAccessToken
+handler['/getSmallAppQr'] = requestHandlers.getSmallAppQr
 
 
 server.serverStart(router.route, handler, requestHandlers)

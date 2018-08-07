@@ -1,7 +1,8 @@
 
 var Q = require('../utils/QtUtil.js')
+var GlobalData = require('../utils/GlobalData.js')
 var querystring = require('querystring')
-
+var https = require('https');
 
 function start(){
   function sleep(milliSeconds){
@@ -300,18 +301,110 @@ function upfile(res, req){
 
     return "hello upfile!";
 }
+/*
+    获取access token
+*/
 function getAccessToken(res, req){
-    var APPID = 'wxf37702f410a6762c'
-    var APPSECRET = 'ad904274f1ad6998df68f3299ea04af5'
+
+    var APPID = GlobalData.APPID
+    var APPSECRET = GlobalData.APPSECRET
     var svrUrl = 'https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=' + APPID + '&secret=' + APPSECRET
+    https.get(svrUrl, function (response) {
+        //var d = [];
+        var a = ''
+        //console.log(response.statusCode);
+        //console.log(response.headers);
+        //console.log(response);
+        response.on('data', function (chunk) {
+            //d.push(chunk);
+            a+=chunk;
+        });
+        response.on('end', function () {
+            //d = Buffer.concat(d);
+            //var b = querystring.parse(a);
+            var jsonObj = JSON.parse(a);
+            console.log(jsonObj);
+            GlobalData.accessToken = jsonObj.access_token
 
-    var headerInfo = {'content-type': 'text/plain; charset=utf-8',"Access-Control-Allow-Origin":"*"}
-    res.writeHead(200, headerInfo)
-    res.write("nihao")
-    //res.end(util.inspect({fields: fields, files: files}));
-    res.end()
+            var headerInfo = {'content-type': 'text/plain; charset=utf-8',"Access-Control-Allow-Origin":"*"}
+            res.writeHead(200, headerInfo)
+            res.write('token success '+GlobalData.accessToken)
+            //res.write(d.toString())
+            //res.end(util.inspect({fields: fields, files: files}));
+            res.end()
+        });
+    });
 }
+/*
+    获取小程序二维码
+*/
+function getSmallAppQr(res, req){
 
+    var APPID = GlobalData.APPID
+    var APPSECRET = GlobalData.APPSECRET
+
+
+            var jsonString = JSON.stringify({
+                
+            })
+
+
+            // var dataObj = JSON.stringify({
+            //     scene: "uid:1000",
+            //     width: 430,
+            //     auto_color: false,
+            //     line_color: { "r": "0", "g": "0", "b": "0" }
+            //   })
+
+            var postData = querystring.stringify({
+                scene: "uid:1000",
+                width: 430,
+                auto_color: false,
+                line_color: { "r": "0", "g": "0", "b": "0" }
+            });
+            //var svrUrl = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=' + paramObj.token
+            var token = GlobalData.accessToken
+
+            var options = {
+                protocol:'https:',
+              host: 'api.weixin.qq.com',
+              path: '/wxa/getwxacodeunlimit?access_token='+token,
+              port:443,
+              method: 'POST',
+              headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Length': Buffer.byteLength(postData)
+                }
+            };
+
+            var req = https.request(options, (res) => {
+                var wxData = []
+              //res.setEncoding('utf8');
+              res.on('data', (chunk) => {
+                wxData.push(chunk)
+              });
+              res.on('end', () => {
+                wxData = Buffer.concat(wxData);
+                //var headerInfo = {'content-type': 'text/plain; charset=utf-8',"Access-Control-Allow-Origin":"*"}
+                //res.writeHead(200, headerInfo)
+                //res.write(wxData.toString())
+                //res.end(util.inspect({fields: fields, files: files}));
+                //res.end()
+
+                
+                console.log('No more data in response.')
+                console.log(wxData)
+              })
+            });
+            req.on('error',(e)=>{
+                console.log(e);
+            })
+            req.write(postData)
+            req.end()
+    
+
+
+}
 
 
 exports.start = start
@@ -319,3 +412,4 @@ exports.upload = upload
 exports.postdata = postdata
 exports.upfile = upfile
 exports.getAccessToken = getAccessToken
+exports.getSmallAppQr = getSmallAppQr
