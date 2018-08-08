@@ -360,7 +360,35 @@ class QtFile
 	}
 
 	
-	
+	/**
+	 * [saveFileWithStream description]
+	 * @param {String} filePath [文件路径]
+	 * @param {Buffer} BufferData [Buffer 数据]
+	 */
+	 saveFile(filePath, BufferData) {
+	 	var Promise = require('es6-promise').Promise
+		 return new Promise((resolve, reject) => {
+		 	  var fs = require('fs')
+			  // 块方式写入文件
+			  const wstream = fs.createWriteStream(filePath);
+			 
+			  wstream.on('open', () => {
+			   const blockSize = 128;
+			   const nbBlocks = Math.ceil(BufferData.length / (blockSize));
+			   for (let i = 0; i < nbBlocks; i += 1) {
+			    const currentBlock = BufferData.slice(
+			     blockSize * i,
+			     Math.min(blockSize * (i + 1), BufferData.length)
+			    );
+			    wstream.write(currentBlock);
+			   }
+			 
+			   wstream.end();
+			  });
+			  wstream.on('error', (err) => { reject(err); });
+			  wstream.on('finish', () => { resolve(true); });
+		 });
+	}
 	
 
 }

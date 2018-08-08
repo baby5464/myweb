@@ -2,7 +2,11 @@
 var Q = require('../utils/QtUtil.js')
 var GlobalData = require('../utils/GlobalData.js')
 var querystring = require('querystring')
-var https = require('https');
+var https = require('https')
+var Promise = require('es6-promise').Promise
+
+var QtFile = require('../files/QtFile.js')
+var file = new QtFile();
 
 function start(){
   function sleep(milliSeconds){
@@ -14,8 +18,6 @@ function start(){
   return "hello start!";
 }
 function postdata(res, req){
-
-    
     var a="";
     req.addListener("data",function(postdata){
         a+=postdata;    //接收到的表单数据字符串，这里可以用两种方法将UTF-8编码转换为中文
@@ -335,19 +337,14 @@ function getAccessToken(res, req){
         });
     });
 }
+
 /*
     获取小程序二维码
 */
 function getSmallAppQr(res, req){
-
+    var _this = this
     var APPID = GlobalData.APPID
     var APPSECRET = GlobalData.APPSECRET
-
-
-            var jsonString = JSON.stringify({
-                
-            })
-
 
             // var dataObj = JSON.stringify({
             //     scene: "uid:1000",
@@ -366,34 +363,44 @@ function getSmallAppQr(res, req){
             var token = GlobalData.accessToken
 
             var options = {
-                protocol:'https:',
-              host: 'api.weixin.qq.com',
-              path: '/wxa/getwxacodeunlimit?access_token='+token,
-              port:443,
-              method: 'POST',
-              headers: {
+                  protocol:'https:',
+                  host: 'api.weixin.qq.com',
+                  path: '/wxa/getwxacodeunlimit?access_token='+token,
+                  port:443,
+                  method: 'POST',
+                  headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'Content-Length': Buffer.byteLength(postData)
-                }
+                  }
             };
 
-            var req = https.request(options, (res) => {
+            var req = https.request(options, (rest) => {
                 var wxData = []
               //res.setEncoding('utf8');
-              res.on('data', (chunk) => {
+              rest.on('data', (chunk) => {
                 wxData.push(chunk)
               });
-              res.on('end', () => {
-                wxData = Buffer.concat(wxData);
-                //var headerInfo = {'content-type': 'text/plain; charset=utf-8',"Access-Control-Allow-Origin":"*"}
-                //res.writeHead(200, headerInfo)
-                //res.write(wxData.toString())
-                //res.end(util.inspect({fields: fields, files: files}));
-                //res.end()
+              rest.on('end', () => {
 
-                
-                console.log('No more data in response.')
-                console.log(wxData)
+                wxData = Buffer.concat(wxData)
+
+                var timeFormatStr = new Date().format("yyyyMMdd-hhmmss")
+                var pngPathUrl = "dist/"+timeFormatStr+".png"
+                file.saveFile(pngPathUrl, wxData).then( data =>{
+                    
+                    var jsonString = JSON.stringify({
+                        pic:GlobalData.host+pngPathUrl,
+                        code:0
+                    })
+                    Q.log(jsonString)
+                    res.write(jsonString)
+                    res.end("")
+                    
+                })
+
+
+                    
+
               })
             });
             req.on('error',(e)=>{
