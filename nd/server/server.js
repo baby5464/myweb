@@ -6,6 +6,7 @@ var http = require('http')
 var https = require('https')
 var url = require('url')
 
+var svrPort = 8000
 var serverTimes = 0
 
 function serverStart(route, handler, requestHandlers){
@@ -81,9 +82,9 @@ function serverStart(route, handler, requestHandlers){
 
     })
 
-    svrObj.listen(8000);
+    svrObj.listen(svrPort);
     
-    console.log('http server start on port 3000');
+    console.log('http server start on port '+svrPort);
 }
 
 exports.serverStart = serverStart;
